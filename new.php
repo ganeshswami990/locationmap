@@ -67,28 +67,7 @@ class WCS_Admin_Post_Types {
 	 * @param  WP_Query $query  	the query object that forms the basis of the SQL
 	 * @return array 				modified pieces of the SQL query
 	 */
-	public function posts_clauses( $pieces, $query ) {
-		global $wpdb;
 
-		if ( ! is_admin() || ! isset( $query->query['post_type'] ) || 'shop_subscription' !== $query->query['post_type'] ) {
-			return $pieces;
-		}
-
-		// Let's check whether we even have the privileges to do the things we want to do
-		if ( $this->is_db_user_privileged() ) {
-			$pieces = self::posts_clauses_high_performance( $pieces );
-		} else {
-			$pieces = self::posts_clauses_low_performance( $pieces );
-		}
-
-		$order = strtoupper( $query->query['order'] );
-
-		// fields and order are identical in both cases
-		$pieces['fields'] .= ', COALESCE(lp.last_payment, o.post_date_gmt, 0) as lp';
-		$pieces['orderby'] = "CAST(lp AS DATETIME) {$order}";
-
-		return $pieces;
-	}
 
 	/**
 	 * Check is database user is capable of doing high performance things, such as creating temporary tables,
